@@ -36,6 +36,14 @@ public class ProductController {
 
 	private ProductService productService;
 
+	/**
+	 * 상세조회
+	 * 
+	 * @param model
+	 * @param id
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/product/{id}")
 	public String search(Model model, @PathVariable("id") String id, HttpServletRequest request) {
 		model.addAttribute("product", productService.findById(id));

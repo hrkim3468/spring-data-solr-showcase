@@ -48,9 +48,24 @@ public class SearchController {
 
 	private ProductService productService;
 
+	@Autowired
+	public void setProductService(ProductService productService) {
+		this.productService = productService;
+	}
+
+	/**
+	 * 검색
+	 * 
+	 * @param model
+	 * @param query
+	 * @param pageable
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/search")
-	public String search(Model model, @RequestParam(value = "q", required = false) String query, @PageableDefault(
-			page = 0, size = ProductService.DEFAULT_PAGE_SIZE) Pageable pageable, HttpServletRequest request) {
+	public String search(Model model, @RequestParam(value = "q", required = false) String query,
+			@PageableDefault(page = 0, size = ProductService.DEFAULT_PAGE_SIZE) Pageable pageable,
+			HttpServletRequest request) {
 
 		model.addAttribute("page", productService.findByName(query, pageable));
 		model.addAttribute("pageable", pageable);
@@ -58,10 +73,19 @@ public class SearchController {
 		return "search";
 	}
 
+	/**
+	 * 자동완성
+	 * 
+	 * @param model
+	 * @param query
+	 * @param pageable
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping(value = "/autocomplete", produces = "application/json")
 	public Set<String> autoComplete(Model model, @RequestParam("term") String query,
 			@PageableDefault(page = 0, size = 1) Pageable pageable) {
+
 		if (!StringUtils.hasText(query)) {
 			return Collections.emptySet();
 		}
@@ -71,17 +95,15 @@ public class SearchController {
 		Set<String> titles = new LinkedHashSet<String>();
 		for (Page<FacetFieldEntry> page : result.getFacetResultPages()) {
 			for (FacetFieldEntry entry : page) {
-				if (entry.getValue().contains(query)) { // we have to do this as we do not use terms vector or a string field
+				if (entry.getValue().contains(query)) { // we have to do this as
+														// we do not use terms
+														// vector or a string
+														// field
 					titles.add(entry.getValue());
 				}
 			}
 		}
 		return titles;
-	}
-
-	@Autowired
-	public void setProductService(ProductService productService) {
-		this.productService = productService;
 	}
 
 }
